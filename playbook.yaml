@@ -1,0 +1,33 @@
+- name: Deploy Web and Database Servers
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update packages
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install Nginx on Web Server
+      apt:
+        name: nginx
+        state: present
+      when: "'web' in group_names"
+
+    - name: Install MySQL on DB Server
+      apt:
+        name: mysql-server
+        state: present
+      when: "'db' in group_names"
+
+    - name: Start Nginx
+      service:
+        name: nginx
+        state: started
+      when: "'web' in group_names"
+
+    - name: Start MySQL
+      service:
+        name: mysql
+        state: started
+      when: "'db' in group_names"
+

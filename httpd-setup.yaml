@@ -1,0 +1,42 @@
+- name: Install and Configure HTTPD
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install Apache (HTTPD) (Debian-based)
+      apt:
+        name: apache2
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install Apache (HTTPD) (RHEL-based)
+      yum:
+        name: httpd
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Start HTTPD Service
+      service:
+        name: "{{ 'apache2' if ansible_os_family == 'Debian' else 'httpd' }}"
+        state: started
+        enabled: yes
+
+    - name: Create index.html with message
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <html>
+          <head><title>Welcome</title></head>
+          <body>
+          <h1>Hey friends, life is full of surprises! Cherish your loved ones and show respect to everyone—you never know what tomorrow brings.".</h1>
+          </body>
+          </html>
+      notify: Restart Apache
+
+  handlers:
+    - name: Restart Apache
+      service:
+        name: "{{ 'apache2' if ansible_os_family == 'Debian' else 'httpd' }}"
+        state: restarted
+
+
+

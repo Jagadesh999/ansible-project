@@ -1,0 +1,20 @@
+- name: Update Linux Packages
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update all packages (Debian-based)
+      apt:
+        update_cache: yes
+        upgrade: dist
+      when: ansible_os_family == "Debian"
+
+    - name: Update all packages (RHEL-based)
+      yum:
+        name: '*'
+        state: latest
+      when: ansible_os_family == "RedHat"
+
+    - name: Reboot the server if needed
+      reboot:
+        reboot_timeout: 300
+
